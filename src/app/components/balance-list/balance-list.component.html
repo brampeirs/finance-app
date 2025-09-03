@@ -1,0 +1,67 @@
+<div class="balance-list-container">
+  <div class="header">
+    <h1>Balance History</h1>
+    <div class="actions">
+      <button 
+        type="button" 
+        class="btn btn-secondary" 
+        (click)="onRefresh()"
+        [disabled]="loading()">
+        Refresh
+      </button>
+      <button 
+        type="button" 
+        class="btn btn-primary" 
+        (click)="onAddBalance()">
+        Add Balance
+      </button>
+    </div>
+  </div>
+
+  @if (loading()) {
+    <div class="loading">
+      <p>Loading balances...</p>
+    </div>
+  }
+
+  @if (error()) {
+    <div class="error">
+      <p>{{ error() }}</p>
+      <button type="button" class="btn btn-secondary" (click)="onRefresh()">
+        Try Again
+      </button>
+    </div>
+  }
+
+  @if (!loading() && !error()) {
+    @if (balances().length === 0) {
+      <div class="empty-state">
+        <p>No balances found.</p>
+        <button type="button" class="btn btn-primary" (click)="onAddBalance()">
+          Add Your First Balance
+        </button>
+      </div>
+    } @else {
+      <div class="balance-table">
+        <table>
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Balance</th>
+              <th>ID</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (balance of balances(); track balance.id) {
+              <tr>
+                <td>{{ balance.date | date:'short' }}</td>
+                <td class="balance-amount">{{ balance.balance | currency:'USD':'symbol':'1.2-2' }}</td>
+                <td class="balance-id">{{ balance.id }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  }
+</div>
