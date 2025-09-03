@@ -9,7 +9,7 @@ import { environment } from '../../environments/environment';
 })
 export class BalanceService {
   private readonly http = inject(HttpClient);
-  private readonly apiUrl = `${environment.apiUrl}/balance`;
+  private readonly apiUrl = `${environment.apiUrl}/balance/`;
 
   getBalances(): Observable<Balance[]> {
     return this.http.get<Balance[]>(this.apiUrl);
