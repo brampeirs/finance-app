@@ -21,7 +21,13 @@ export class AddBalanceComponent {
   protected readonly error = signal<string | null>(null);
 
   protected readonly balanceForm: FormGroup = this.fb.group({
-    date: ['', [Validators.required]],
+    date: [
+      '',
+      [
+        Validators.required,
+        Validators.pattern(/^\d{4}-(0[1-9]|1[0-2])$/), // enforce YYYY-MM
+      ],
+    ],
     balance: ['', [Validators.required, Validators.min(0)]],
   });
 
@@ -33,7 +39,8 @@ export class AddBalanceComponent {
       const formValue = this.balanceForm.value;
       const createRequest: CreateBalanceRequest = {
         id: this.generateNumericId(),
-        date: formValue.date,
+        // Ensure date is in YYYY-MM format (type="month" provides this)
+        date: typeof formValue.date === 'string' ? formValue.date : '',
         balance: parseFloat(formValue.balance),
       };
 
@@ -71,6 +78,11 @@ export class AddBalanceComponent {
         return `${
           fieldName.charAt(0).toUpperCase() + fieldName.slice(1)
         } must be greater than or equal to 0`;
+      }
+      if (field.errors?.['pattern']) {
+        if (fieldName === 'date') {
+          return 'Date must be in YYYY-MM format';
+        }
       }
     }
     return null;

@@ -72,7 +72,7 @@
         @for (balance of balances(); track balance.id) {
         <tr class="hover:bg-gray-50 transition-colors duration-150">
           <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-            {{ balance.date | date : 'short' }}
+            {{ balance.date }}
           </td>
           <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-green-600">
             {{ balance.balance | currency : 'USD' : 'symbol' : '1.2-2' }}
