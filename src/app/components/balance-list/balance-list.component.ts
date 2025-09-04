@@ -9,15 +9,17 @@ import { Balance } from '../../models/balance.model';
   imports: [CommonModule],
   templateUrl: './balance-list.component.html',
   styleUrl: './balance-list.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BalanceListComponent implements OnInit {
   private readonly balanceService = inject(BalanceService);
   private readonly router = inject(Router);
 
-  protected readonly balances = signal<Balance[]>([]);
-  protected readonly loading = signal(false);
-  protected readonly error = signal<string | null>(null);
+  readonly balances = signal<Balance[]>([]);
+  readonly loading = signal(false);
+  readonly error = signal<string | null>(null);
+  readonly deleting = signal<number | null>(null);
+  readonly showDeleteConfirm = signal<number | null>(null);
 
   ngOnInit(): void {
     this.loadBalances();
@@ -26,7 +28,7 @@ export class BalanceListComponent implements OnInit {
   private loadBalances(): void {
     this.loading.set(true);
     this.error.set(null);
-    
+
     this.balanceService.getBalances().subscribe({
       next: (balances) => {
         this.balances.set(balances);
@@ -36,15 +38,42 @@ export class BalanceListComponent implements OnInit {
         this.error.set('Failed to load balances');
         this.loading.set(false);
         console.error('Error loading balances:', err);
-      }
+      },
     });
   }
 
-  protected onAddBalance(): void {
+  onAddBalance(): void {
     this.router.navigate(['/balance/add']);
   }
 
-  protected onRefresh(): void {
+  onRefresh(): void {
     this.loadBalances();
+  }
+
+  onDeleteBalance(id: number): void {
+    this.showDeleteConfirm.set(id);
+  }
+
+  onConfirmDelete(id: number): void {
+    this.deleting.set(id);
+    this.showDeleteConfirm.set(null);
+    this.error.set(null);
+
+    this.balanceService.deleteBalance(id).subscribe({
+      next: () => {
+        // Remove the deleted balance from the list
+        this.balances.update((balances) => balances.filter((b) => b.id !== id));
+        this.deleting.set(null);
+      },
+      error: (err) => {
+        this.error.set('Failed to delete balance');
+        this.deleting.set(null);
+        console.error('Error deleting balance:', err);
+      },
+    });
+  }
+
+  onCancelDelete(): void {
+    this.showDeleteConfirm.set(null);
   }
 }

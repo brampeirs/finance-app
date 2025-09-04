@@ -18,4 +18,8 @@ export class BalanceService {
   createBalance(balance: CreateBalanceRequest): Observable<Balance> {
     return this.http.post<Balance>(this.apiUrl, balance);
   }
+
+  deleteBalance(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}${id}`);
+  }
 }
