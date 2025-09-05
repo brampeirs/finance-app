@@ -5,7 +5,6 @@ export interface Balance {
 }
 
 export interface CreateBalanceRequest {
-  id: number;
   date: string;
   balance: number;
 }

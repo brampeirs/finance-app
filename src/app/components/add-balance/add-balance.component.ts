@@ -38,7 +38,6 @@ export class AddBalanceComponent {
 
       const formValue = this.balanceForm.value;
       const createRequest: CreateBalanceRequest = {
-        id: this.generateNumericId(),
         // Ensure date is in YYYY-MM format (type="month" provides this)
         date: typeof formValue.date === 'string' ? formValue.date : '',
         balance: parseFloat(formValue.balance),
@@ -60,12 +59,6 @@ export class AddBalanceComponent {
 
   protected onCancel(): void {
     this.router.navigate(['/balances']);
-  }
-
-  private generateNumericId(): number {
-    // Generate a random number between 1000 and 999999
-    // In a real app, this would typically be handled by the backend
-    return Math.floor(Math.random() * (999999 - 1000 + 1)) + 1000;
   }
 
   protected getFieldError(fieldName: string): string | null {
