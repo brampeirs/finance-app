@@ -20,9 +20,13 @@ export class AddBalanceComponent {
   protected readonly submitting = signal(false);
   protected readonly error = signal<string | null>(null);
 
+  private formatDateForInput(date: Date): string {
+    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+  }
+
   protected readonly balanceForm: FormGroup = this.fb.group({
     date: [
-      '',
+      this.formatDateForInput(new Date()),
       [
         Validators.required,
         Validators.pattern(/^\d{4}-(0[1-9]|1[0-2])$/), // enforce YYYY-MM
