@@ -19,21 +19,21 @@ export class MetricsService {
 
   getCurrentMonthMetrics(): Observable<CurrentMonthMetrics> {
     return this.http
-      .get<CurrentMonthMetrics>(`${this.apiUrl}/current-month`)
+      .get<CurrentMonthMetrics>(`${this.apiUrl}/current-month/`)
       .pipe(catchError(this.handleError));
   }
 
   getDeltaMetrics(start: string, end: string): Observable<DeltaMetrics> {
     const params = { start, end };
     return this.http
-      .get<DeltaMetrics>(`${this.apiUrl}/delta`, { params })
+      .get<DeltaMetrics>(`${this.apiUrl}/delta/`, { params })
       .pipe(catchError(this.handleError));
   }
 
   getSummaryMetrics(start: string, end: string): Observable<MetricsSummary> {
     const params = { start, end };
     return this.http
-      .get<MetricsSummary>(`${this.apiUrl}/summary`, { params })
+      .get<MetricsSummary>(`${this.apiUrl}/summary/`, { params })
       .pipe(catchError(this.handleError));
   }
 
