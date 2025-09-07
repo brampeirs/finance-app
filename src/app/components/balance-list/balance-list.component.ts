@@ -46,6 +46,10 @@ export class BalanceListComponent implements OnInit {
     this.router.navigate(['/balance/add']);
   }
 
+  onViewMetrics(): void {
+    this.router.navigate(['/metrics']);
+  }
+
   onRefresh(): void {
     this.loadBalances();
   }

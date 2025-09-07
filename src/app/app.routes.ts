@@ -19,6 +19,11 @@ export const routes: Routes = [
       import('./components/add-balance/add-balance.component').then((m) => m.AddBalanceComponent),
   },
   {
+    path: 'metrics',
+    loadComponent: () =>
+      import('./components/metrics/metrics.component').then((m) => m.MetricsComponent),
+  },
+  {
     path: '**',
     redirectTo: '/balances',
   },
