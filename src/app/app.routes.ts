@@ -24,6 +24,10 @@ export const routes: Routes = [
       import('./components/metrics/metrics.component').then((m) => m.MetricsComponent),
   },
   {
+    path: 'chat',
+    loadComponent: () => import('./components/chat/chat.component').then((m) => m.ChatComponent),
+  },
+  {
     path: '**',
     redirectTo: '/balances',
   },
