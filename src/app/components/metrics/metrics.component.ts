@@ -22,189 +22,8 @@ import {
   selector: 'app-metrics',
   imports: [CommonModule, FormsModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  template: `
-    <div class="max-w-6xl mx-auto p-6">
-      <div class="flex justify-between items-center mb-6">
-        <h1 class="text-3xl font-bold text-gray-900">Financial Metrics</h1>
-        <button
-          type="button"
-          class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors duration-200"
-          (click)="navigateToBalances()"
-        >
-          Back to Balances
-        </button>
-      </div>
-
-      <!-- Date Range Selection -->
-      <div class="bg-white rounded-lg shadow-md p-6 mb-6">
-        <h2 class="text-xl font-semibold mb-4">Select Date Range</h2>
-        <div class="flex gap-4 items-end">
-          <div>
-            <label for="startDate" class="block text-sm font-medium text-gray-700 mb-1">
-              Start Month
-            </label>
-            <input
-              id="startDate"
-              type="month"
-              [(ngModel)]="startDate"
-              class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            />
-          </div>
-          <div>
-            <label for="endDate" class="block text-sm font-medium text-gray-700 mb-1">
-              End Month
-            </label>
-            <input
-              id="endDate"
-              type="month"
-              [(ngModel)]="endDate"
-              class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            />
-          </div>
-          <button
-            type="button"
-            class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 disabled:opacity-50"
-            [disabled]="loading()"
-            (click)="loadMetrics()"
-          >
-            Load Metrics
-          </button>
-        </div>
-      </div>
-
-      @if (loading()) {
-      <div class="text-center py-12">
-        <p class="text-gray-600">Loading metrics...</p>
-      </div>
-      } @if (error()) {
-      <div class="bg-red-50 border border-red-200 rounded-lg p-6 mb-6">
-        <p class="text-red-600 mb-4">{{ error() }}</p>
-        <button
-          type="button"
-          class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors duration-200"
-          (click)="loadMetrics()"
-        >
-          Try Again
-        </button>
-      </div>
-      } @if (!loading() && !error() && hasData()) {
-      <!-- KPIs Section -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-        @if (summaryMetrics()) {
-        <div class="bg-white rounded-lg shadow-md p-6">
-          <h3 class="text-lg font-semibold text-gray-700 mb-2">End Balance</h3>
-          <p class="text-3xl font-bold text-blue-600">
-            {{ formatCurrency(summaryMetrics()!.end_balance) }}
-          </p>
-        </div>
-
-        <div class="bg-white rounded-lg shadow-md p-6">
-          <h3 class="text-lg font-semibold text-gray-700 mb-2">Total Change</h3>
-          <p class="text-3xl font-bold" [class]="getTotalChangeClass()">
-            {{ formatCurrency(summaryMetrics()!.total_change) }}
-          </p>
-        </div>
-
-        <div class="bg-white rounded-lg shadow-md p-6">
-          <h3 class="text-lg font-semibold text-gray-700 mb-2">Last Month Delta</h3>
-          <p class="text-3xl font-bold" [class]="getLastMonthDeltaClass()">
-            {{ formatCurrency(summaryMetrics()!.last_month_delta) }}
-          </p>
-        </div>
-        }
-      </div>
-
-      <!-- Monthly Data Table -->
-      @if (deltaMetrics()) {
-      <div class="bg-white rounded-lg shadow-md overflow-hidden">
-        <div class="px-6 py-4 border-b border-gray-200">
-          <h2 class="text-xl font-semibold text-gray-900">Monthly Balance History</h2>
-        </div>
-
-        <div class="overflow-x-auto">
-          <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50">
-              <tr>
-                <th
-                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
-                  Month
-                </th>
-                <th
-                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
-                  Balance
-                </th>
-                <th
-                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
-                  Delta
-                </th>
-              </tr>
-            </thead>
-            <tbody class="bg-white divide-y divide-gray-200">
-              @for (item of deltaMetrics()!.items; track item.month) {
-              <tr>
-                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                  {{ formatMonth(item.month) }}
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  {{ formatCurrency(item.balance) }}
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm" [class]="getDeltaClass(item.delta)">
-                  {{ formatCurrency(item.delta) }}
-                </td>
-              </tr>
-              }
-            </tbody>
-          </table>
-        </div>
-
-        @if (deltaMetrics()!.missing_months.length > 0) {
-        <div class="px-6 py-4 bg-yellow-50 border-t border-gray-200">
-          <p class="text-sm text-yellow-800">
-            <strong>Missing data for months:</strong>
-            {{ deltaMetrics()!.missing_months.join(', ') }}
-          </p>
-        </div>
-        }
-      </div>
-      }
-
-      <!-- Additional Summary Stats -->
-      @if (summaryMetrics()) {
-      <div class="mt-6 bg-white rounded-lg shadow-md p-6">
-        <h3 class="text-lg font-semibold text-gray-900 mb-4">Summary Statistics</h3>
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div>
-            <p class="text-sm text-gray-600">Start Balance</p>
-            <p class="text-lg font-semibold">
-              {{ formatCurrency(summaryMetrics()!.start_balance) }}
-            </p>
-          </div>
-          <div>
-            <p class="text-sm text-gray-600">Avg Monthly Change</p>
-            <p class="text-lg font-semibold">
-              {{ formatCurrency(summaryMetrics()!.avg_monthly_change) }}
-            </p>
-          </div>
-          <div>
-            <p class="text-sm text-gray-600">Positive Months</p>
-            <p class="text-lg font-semibold text-green-600">
-              {{ summaryMetrics()!.positive_months }}
-            </p>
-          </div>
-          <div>
-            <p class="text-sm text-gray-600">Negative Months</p>
-            <p class="text-lg font-semibold text-red-600">
-              {{ summaryMetrics()!.negative_months }}
-            </p>
-          </div>
-        </div>
-      </div>
-      } }
-    </div>
-  `,
+  templateUrl: './metrics.component.html',
+  styleUrl: './metrics.component.scss',
 })
 export class MetricsComponent implements OnInit {
   private readonly metricsService = inject(MetricsService);
@@ -304,19 +123,25 @@ export class MetricsComponent implements OnInit {
   }
 
   protected getDeltaClass(delta: number | null): string {
-    if (delta === null) return 'text-gray-500';
-    return delta >= 0 ? 'text-green-600' : 'text-red-600';
+    if (delta === null) return 'text-gray-500 dark:text-gray-400';
+    return delta >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400';
   }
 
   protected getTotalChangeClass(): string {
     const totalChange = this.summaryMetrics()?.total_change;
-    if (totalChange === null || totalChange === undefined) return 'text-gray-500';
-    return totalChange >= 0 ? 'text-green-600' : 'text-red-600';
+    if (totalChange === null || totalChange === undefined)
+      return 'text-gray-500 dark:text-gray-400';
+    return totalChange >= 0
+      ? 'text-green-600 dark:text-green-400'
+      : 'text-red-600 dark:text-red-400';
   }
 
   protected getLastMonthDeltaClass(): string {
     const lastMonthDelta = this.summaryMetrics()?.last_month_delta;
-    if (lastMonthDelta === null || lastMonthDelta === undefined) return 'text-gray-500';
-    return lastMonthDelta >= 0 ? 'text-green-600' : 'text-red-600';
+    if (lastMonthDelta === null || lastMonthDelta === undefined)
+      return 'text-gray-500 dark:text-gray-400';
+    return lastMonthDelta >= 0
+      ? 'text-green-600 dark:text-green-400'
+      : 'text-red-600 dark:text-red-400';
   }
 }

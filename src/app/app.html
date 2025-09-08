@@ -1,21 +1,26 @@
-<nav class="bg-gray-800 text-white py-4 shadow-lg">
+<nav
+  class="bg-white dark:bg-gray-800 text-gray-900 dark:text-white py-4 shadow-lg border-b border-gray-200 dark:border-gray-700"
+>
   <div class="max-w-6xl mx-auto px-8 flex justify-between items-center">
     <h1 class="text-xl font-semibold">{{ title() }}</h1>
-    <div class="flex space-x-8">
-      <a
-        routerLink="/balances"
-        class="text-gray-300 hover:text-white font-medium transition-colors duration-200"
-        >Balances</a
-      >
-      <a
-        routerLink="/balance/add"
-        class="text-gray-300 hover:text-white font-medium transition-colors duration-200"
-        >Add Balance</a
-      >
+    <div class="flex items-center space-x-8">
+      <div class="flex space-x-8">
+        <a
+          routerLink="/balances"
+          class="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white font-medium transition-colors duration-200"
+          >Balances</a
+        >
+        <a
+          routerLink="/balance/add"
+          class="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white font-medium transition-colors duration-200"
+          >Add Balance</a
+        >
+      </div>
+      <app-theme-toggle></app-theme-toggle>
     </div>
   </div>
 </nav>
 
-<main class="min-h-screen bg-gray-50">
+<main class="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
   <router-outlet />
 </main>

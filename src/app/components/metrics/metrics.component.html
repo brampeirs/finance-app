@@ -1,0 +1,213 @@
+<div class="max-w-6xl mx-auto p-6">
+  <div class="flex justify-between items-center mb-6">
+    <h1 class="text-3xl font-bold text-gray-900 dark:text-gray-100">Financial Metrics</h1>
+    <button
+      type="button"
+      class="px-4 py-2 bg-gray-600 dark:bg-gray-500 text-white rounded-lg hover:bg-gray-700 dark:hover:bg-gray-600 transition-colors duration-200"
+      (click)="navigateToBalances()"
+    >
+      Back to Balances
+    </button>
+  </div>
+
+  <!-- Date Range Selection -->
+  <div
+    class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6 border border-gray-200 dark:border-gray-700"
+  >
+    <h2 class="text-xl font-semibold mb-4 text-gray-900 dark:text-gray-100">
+      Select Date Range
+    </h2>
+    <div class="flex gap-4 items-end">
+      <div>
+        <label
+          for="startDate"
+          class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+        >
+          Start Month
+        </label>
+        <input
+          id="startDate"
+          type="month"
+          [(ngModel)]="startDate"
+          class="px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400"
+        />
+      </div>
+      <div>
+        <label
+          for="endDate"
+          class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+        >
+          End Month
+        </label>
+        <input
+          id="endDate"
+          type="month"
+          [(ngModel)]="endDate"
+          class="px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400"
+        />
+      </div>
+      <button
+        type="button"
+        class="px-6 py-2 bg-blue-600 dark:bg-blue-500 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors duration-200 disabled:opacity-50"
+        [disabled]="loading()"
+        (click)="loadMetrics()"
+      >
+        Load Metrics
+      </button>
+    </div>
+  </div>
+
+  @if (loading()) {
+  <div class="text-center py-12">
+    <p class="text-gray-600 dark:text-gray-400">Loading metrics...</p>
+  </div>
+  } @if (error()) {
+  <div
+    class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-6 mb-6"
+  >
+    <p class="text-red-600 dark:text-red-400 mb-4">{{ error() }}</p>
+    <button
+      type="button"
+      class="px-4 py-2 bg-gray-600 dark:bg-gray-500 text-white rounded-lg hover:bg-gray-700 dark:hover:bg-gray-600 transition-colors duration-200"
+      (click)="loadMetrics()"
+    >
+      Try Again
+    </button>
+  </div>
+  } @if (!loading() && !error() && hasData()) {
+  <!-- KPIs Section -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+    @if (summaryMetrics()) {
+    <div
+      class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 border border-gray-200 dark:border-gray-700"
+    >
+      <h3 class="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2">End Balance</h3>
+      <p class="text-3xl font-bold text-blue-600 dark:text-blue-400">
+        {{ formatCurrency(summaryMetrics()!.end_balance) }}
+      </p>
+    </div>
+
+    <div
+      class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 border border-gray-200 dark:border-gray-700"
+    >
+      <h3 class="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2">Total Change</h3>
+      <p class="text-3xl font-bold" [class]="getTotalChangeClass()">
+        {{ formatCurrency(summaryMetrics()!.total_change) }}
+      </p>
+    </div>
+
+    <div
+      class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 border border-gray-200 dark:border-gray-700"
+    >
+      <h3 class="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2">
+        Last Month Delta
+      </h3>
+      <p class="text-3xl font-bold" [class]="getLastMonthDeltaClass()">
+        {{ formatCurrency(summaryMetrics()!.last_month_delta) }}
+      </p>
+    </div>
+    }
+  </div>
+
+  <!-- Monthly Data Table -->
+  @if (deltaMetrics()) {
+  <div
+    class="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden border border-gray-200 dark:border-gray-700"
+  >
+    <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+      <h2 class="text-xl font-semibold text-gray-900 dark:text-gray-100">
+        Monthly Balance History
+      </h2>
+    </div>
+
+    <div class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+        <thead class="bg-gray-50 dark:bg-gray-700">
+          <tr>
+            <th
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+            >
+              Month
+            </th>
+            <th
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+            >
+              Balance
+            </th>
+            <th
+              class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider"
+            >
+              Delta
+            </th>
+          </tr>
+        </thead>
+        <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+          @for (item of deltaMetrics()!.items; track item.month) {
+          <tr>
+            <td
+              class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100"
+            >
+              {{ formatMonth(item.month) }}
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+              {{ formatCurrency(item.balance) }}
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm" [class]="getDeltaClass(item.delta)">
+              {{ formatCurrency(item.delta) }}
+            </td>
+          </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    @if (deltaMetrics()!.missing_months.length > 0) {
+    <div
+      class="px-6 py-4 bg-yellow-50 dark:bg-yellow-900/20 border-t border-gray-200 dark:border-gray-700"
+    >
+      <p class="text-sm text-yellow-800 dark:text-yellow-400">
+        <strong>Missing data for months:</strong>
+        {{ deltaMetrics()!.missing_months.join(', ') }}
+      </p>
+    </div>
+    }
+  </div>
+  }
+
+  <!-- Additional Summary Stats -->
+  @if (summaryMetrics()) {
+  <div
+    class="mt-6 bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 border border-gray-200 dark:border-gray-700"
+  >
+    <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
+      Summary Statistics
+    </h3>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div>
+        <p class="text-sm text-gray-600 dark:text-gray-400">Start Balance</p>
+        <p class="text-lg font-semibold text-gray-900 dark:text-gray-100">
+          {{ formatCurrency(summaryMetrics()!.start_balance) }}
+        </p>
+      </div>
+      <div>
+        <p class="text-sm text-gray-600 dark:text-gray-400">Avg Monthly Change</p>
+        <p class="text-lg font-semibold text-gray-900 dark:text-gray-100">
+          {{ formatCurrency(summaryMetrics()!.avg_monthly_change) }}
+        </p>
+      </div>
+      <div>
+        <p class="text-sm text-gray-600 dark:text-gray-400">Positive Months</p>
+        <p class="text-lg font-semibold text-green-600 dark:text-green-400">
+          {{ summaryMetrics()!.positive_months }}
+        </p>
+      </div>
+      <div>
+        <p class="text-sm text-gray-600 dark:text-gray-400">Negative Months</p>
+        <p class="text-lg font-semibold text-red-600 dark:text-red-400">
+          {{ summaryMetrics()!.negative_months }}
+        </p>
+      </div>
+    </div>
+  </div>
+  } }
+</div>
