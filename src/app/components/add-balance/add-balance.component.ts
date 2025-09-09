@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { BalanceService } from '../../services/balance.service';
-import { CreateBalanceRequest } from '../../models/balance.model';
+import { CreateBalanceRequest, BalanceError } from '../../models/balance.model';
 
 @Component({
   selector: 'app-add-balance',
@@ -52,9 +52,9 @@ export class AddBalanceComponent {
           this.submitting.set(false);
           this.router.navigate(['/balances']);
         },
-        error: (err) => {
+        error: (err: BalanceError) => {
           this.submitting.set(false);
-          this.error.set('Failed to create balance. Please try again.');
+          this.error.set(err.message);
           console.error('Error creating balance:', err);
         },
       });

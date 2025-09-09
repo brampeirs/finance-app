@@ -2,7 +2,7 @@ import { Component, inject, signal, OnInit, ChangeDetectionStrategy } from '@ang
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { BalanceService } from '../../services/balance.service';
-import { Balance } from '../../models/balance.model';
+import { Balance, BalanceError } from '../../models/balance.model';
 
 @Component({
   selector: 'app-balance-list',
@@ -34,8 +34,8 @@ export class BalanceListComponent implements OnInit {
         this.balances.set(balances);
         this.loading.set(false);
       },
-      error: (err) => {
-        this.error.set('Failed to load balances');
+      error: (err: BalanceError) => {
+        this.error.set(err.message);
         this.loading.set(false);
         console.error('Error loading balances:', err);
       },
@@ -69,8 +69,8 @@ export class BalanceListComponent implements OnInit {
         this.balances.update((balances) => balances.filter((b) => b.id !== id));
         this.deleting.set(null);
       },
-      error: (err) => {
-        this.error.set('Failed to delete balance');
+      error: (err: BalanceError) => {
+        this.error.set(err.message);
         this.deleting.set(null);
         console.error('Error deleting balance:', err);
       },
