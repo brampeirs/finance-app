@@ -2,7 +2,12 @@
   class="bg-white dark:bg-gray-800 text-gray-900 dark:text-white py-4 shadow-lg border-b border-gray-200 dark:border-gray-700"
 >
   <div class="max-w-6xl mx-auto px-8 flex justify-between items-center">
-    <h1 class="text-xl font-semibold">{{ title() }}</h1>
+    <a
+      routerLink="/balances"
+      class="text-xl font-semibold hover:text-gray-700 dark:hover:text-gray-300 transition-colors duration-200 cursor-pointer"
+    >
+      {{ title() }}
+    </a>
     <div class="flex items-center space-x-8">
       <div class="flex space-x-8">
         <a
